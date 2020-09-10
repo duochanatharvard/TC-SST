@@ -65,7 +65,7 @@ We provide the following guidance for users interested in reproducing our full a
 ### A. Generating HadISST1b
 [<span style="color:gray">Back to Table of contents</span>](#table-of-contents)
 
-The generation of HadISST1b requires merging [groupwise bucket corrections](https://www.nature.com/articles/s41586-019-1349-2) to the [HadISST](https://www.metoffice.gov.uk/hadobs/hadisst/) dataset.  To start, download groupwise corrected bucket-only SSTs at 2-degree resolution (1.5GB) from [here]() and place them under ```$Data_directory/SSTs/Step_0_2_degree_bucket_only_uninfilled_estimates/```.  Codes for generating these bucket-only estimates can be found [here](https://github.com/duochanatharvard/Homogeneous_early_20th_century_warming).  ICOADS3.0 is also required for counting the percentage of bucket measurements to all SSTs in individual monthly 5-degree boxes, which can be downloaded from [here](https://dataverse.harvard.edu/file.xhtml?persistentId=doi:10.7910/DVN/DXJIGA/KWDPTS&version=2.0) (31.8GB).  In [TC_SST_IO.m](TC_SST_IO.m), the directory in which ICOADS3.0 is stored also needs to be specified.
+The generation of HadISST1b requires merging [groupwise bucket corrections](https://www.nature.com/articles/s41586-019-1349-2) to the [HadISST](https://www.metoffice.gov.uk/hadobs/hadisst/) dataset.  To start, download groupwise corrected bucket-only SSTs (2-degree resolution, 1.5GB) from [here]() and place them under ```$Data_directory/SSTs/Step_0_2_degree_bucket_only_uninfilled_estimates/```.  Codes for generating these bucket-only estimates can be found [here](https://github.com/duochanatharvard/Homogeneous_early_20th_century_warming).  ICOADS3.0 is also required for counting the percentage of bucket measurements to all SSTs in individual monthly 5-degree boxes, which can be downloaded from [here](https://dataverse.harvard.edu/file.xhtml?persistentId=doi:10.7910/DVN/DXJIGA/KWDPTS&version=2.0) (31.8GB).  In [TC_SST_IO.m](TC_SST_IO.m), the directory in which ICOADS3.0 is stored also needs to be specified.
 
 ```
 elseif strcmp(input,'ICOADS_raw')
@@ -84,6 +84,3 @@ It takes around 3.5 hours to finish one ensemble member.
 
 ### B. Hurricane permitting simulations using GFDL-HiRAM
 [<span style="color:gray">Back to Table of contents</span>](#table-of-contents)
-
-
-Maintained by __Duo Chan__ (duochan@g.harvard.edu)
