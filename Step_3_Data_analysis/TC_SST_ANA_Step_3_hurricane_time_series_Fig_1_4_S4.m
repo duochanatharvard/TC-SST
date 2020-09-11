@@ -232,9 +232,6 @@ CDF_panel([1885 2011 0 3],'','','','Sensitivity','fontsize',19);
 set(gcf,'position',[.1 14 12 3]*1.1,'unit','inches')
 set(gcf,'position',[.1 14 12 3]*1.1,'unit','inches')
 
-nanmean(Tab_slope)
-CDC_std(Tab_slope)
-
 disp(['alpha -- had:  ',num2str(nanmean(Tab_slope(:,1)),'%6.2f'),' +/- ',num2str(CDC_std(Tab_slope(:,1),1)*1,'%6.2f')])
 disp(['alpha -- hadb: ',num2str(nanmean(Tab_slope(:,2)),'%6.2f'),' +/- ',num2str(CDC_std(Tab_slope(:,2),1)*1,'%6.2f')])
 disp(' ')

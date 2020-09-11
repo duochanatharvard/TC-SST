@@ -28,7 +28,7 @@ If you have issues implementing the above scripts or identify any deficiencies, 
 
 [<span style="color:gray">Back to Table of contents</span>](#table-of-contents)
 
-Run [TC_SST_init.m](TC_SST_init.m) to initialize the analysis.  This script will add all codes in this package to the Matlab path and set up directories structured following the below figure.  The default path will be the directory of this package; so please make sure around 15GB of disk space is available, or, specify another directory to store the data using ```$DATA_home```:
+Run [TC_SST_init.m](TC_SST_init.m) to initialize the analysis.  This script will add all codes in this package to the Matlab path and set up directories structured following the below figure.  The default path will be the directory of this package; so please make sure around 15GB of disk space is available, or specify another directory to store the data using ```$DATA_home```:
 
 ```
 TC_SST_init($DATA_home)

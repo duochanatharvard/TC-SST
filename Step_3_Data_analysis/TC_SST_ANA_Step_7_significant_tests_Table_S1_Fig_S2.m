@@ -19,7 +19,7 @@ ERR = load([TC_SST_IO('Results'),'Error_from_SST_R1.mat']);
 % *************************************************************************  
 clear('P')
 P.region = 'NA';
-P.threshold_wind = 33;
+P.threshold_wind = 31.7;
 [NA0,~,~]        = TC_SST_ANA_function_read_data(0,P);
 [NA1,~,yr]       = TC_SST_ANA_function_read_data(1,P);
 
@@ -109,18 +109,23 @@ for ct = [1 2]
 
 end
 
-Table_latex = [num2str(Table_yr,'& %4.0f - %4.0f  &'), num2str(Table,' %6.2f  & %5.2f & %6.2f  & %5.2f \\\\')];
-
-Table_latex
-
-Table_sig_95
-
-Table_sig_90
+%
+Table_latex = [['15-yr &  ';'25-yr &  '], num2str(Table,' %6.2f  & %5.2f & %6.2f  & %5.2f \\\\')];
+disp(' ')
+disp(' ')
+disp('     & Period & R^2(HadISST1) & R^2(HadISST1b) &  RMSE(HadISST1) & RMSE(HadISST1b) \\')
+disp(Table_latex(1,:))
+disp(['significance at the 0.05 level:  & -- & ', num2str(Table_sig_95(1,[2 4]) ,'%2.0f  & -- & %2.0f \\\\')])
+disp(['significance at the 0.10 level:  & -- & '  , num2str(Table_sig_90(1,[2 4]) ,'%2.0f  & -- & %2.0f \\\\')])
+disp(Table_latex(2,:))
+disp(['significance at the 0.05 level:  & -- & ', num2str(Table_sig_95(2,[2 4]) ,'%2.0f  & -- & %2.0f \\\\')])
+disp(['significance at the 0.10 level:  & -- & ', num2str(Table_sig_90(2,[2 4]) ,'%2.0f  & -- & %2.0f \\\\')])
 
 
 function [RS0, RS1, RMSE0, RMSE1, S] = ...
                   significance_test_null_distribution(yr_list,sm_yr,TC_obs,TC_rnd,TC_mod_0,TC_mod_1,P)
     
+    rng(0);
     N_sample     = P.N_sample;
     block_size   = P.block_size;
     Internal_std = P.Internal_std;
