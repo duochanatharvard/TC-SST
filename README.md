@@ -84,3 +84,13 @@ It takes around 3.5 hours to finish one ensemble member.
 
 ### B. Hurricane permitting simulations using GFDL-HiRAM
 [<span style="color:gray">Back to Table of contents</span>](#table-of-contents)
+
+The [GFDL/HiRAM](https://www.gfdl.noaa.gov/hiram/) has been ported on the [tiger cluster](https://researchcomputing.princeton.edu/systems-and-services/available-systems/tiger) following the [quickstart guide](https://www.gfdl.noaa.gov/hiram-quickstart/). To run the historical simulations, simply copy the [namelists file](Step_2_Model_simulations/namelists_HIRAM_amipHadISSTlong) and [run script](Step_2_Model_simulations/run_HIRAM_amipHadISSTlong_e1_540PE) to the same directory and run the following command under Shell:
+
+```
+sbatch run_HIRAM_amipHadISSTlong_e1_540PE
+```
+
+This will submit the job running the first ensemble simulation forced by HadISST1. To run other ensemble members (e.g. 2, 3, 4 and 5), simply set the `en` varialbe to the corresponding ensemble number in line 15 of the run script. For simulations forced by HadISST1b instead of HadISST1, just comment out line 44 and uncomment line 45 in the run script.
+
+It should be noted that the run script is designed to work under the tiger cluster at Princeton University. Users working on other machines or environments may need to make necessary changes.
