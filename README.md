@@ -92,5 +92,6 @@ sbatch run_HIRAM_amipHadISSTlong_e1_540PE
 ```
 
 This will submit the job running the first ensemble simulation forced by HadISST1. To run other ensemble members (e.g. 2, 3, 4 and 5), simply set the `en` varialbe to the corresponding ensemble number in line 15 of the run script. For simulations forced by HadISST1b instead of HadISST1, just comment out line 44 and uncomment line 45 in the run script.
-
 It should be noted that the run script is designed to work under the tiger cluster at Princeton University. Users working on other machines or environments may need to make necessary changes.
+
+For tropical cyclone tracking, we follow the algorithm described in the appendix of [Harris et al. 2016](https://doi.org/10.1175/JCLI-D-15-0389.1).
