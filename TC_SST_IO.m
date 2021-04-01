@@ -7,6 +7,7 @@ function output = TC_SST_IO(input)
         % output = '/Users/duochan/Data/SST_Cyclone/Data_publish/';
         load('TC_SST_directories.mat')
         output = dir_data;
+        % output = '/Users/duochan/Data/SST_Cyclone/DATA/';
 
     elseif strcmp(input,'ICOADS_raw')
         output = '/Users/duochan/Data/ICOADS3/ICOADS_QCed/';
@@ -28,6 +29,9 @@ function output = TC_SST_IO(input)
 
     elseif strcmp(input,'Results')
         output = [TC_SST_IO('home'),'Results/'];
+
+    elseif strcmp(input,'Figure_save')
+        output = '/Users/duochan/Dropbox/Research/06_SST_TC/TC_manuscript/Initial_submission_to_Science_Advances/Revision1/Figures/Materials/';
 
     end
 end

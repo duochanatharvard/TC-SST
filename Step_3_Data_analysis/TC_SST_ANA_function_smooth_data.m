@@ -8,62 +8,23 @@ function [NA0_sm,NA1_sm,TC_sm,TC_sm_rnd,TC_sm_rnd_err] ...
     end
 
     dir_home = TC_SST_IO('Results');
-    do_boot = P.do_boot;
+    
+    % *********************************************************************
+    % Smooth model outputs
+    % *********************************************************************
+    if sm_yr > 1
+        NA0_sm = nan(size(NA0));
+        for ct = 1:size(NA0,1)
+            NA0_sm(ct,:) = smooth(double(NA0(ct,:)),sm_yr);
+        end
 
-    if do_boot == 0  % compute uncertainty using only 5 members
-        if sm_yr > 1
-            for ct = 1:size(NA0,1)
-                NA0_sm(ct,:) = smooth(double(NA0(ct,:)),sm_yr);
-            end
-
-            for ct = 1:size(NA1,1)
-                NA1_sm(ct,:) = smooth(double(NA1(ct,:)),sm_yr);
-            end
-        else
-            NA0_sm = NA0;
-            NA1_sm = NA1;
+        NA1_sm = nan(size(NA1));
+        for ct = 1:size(NA1,1)
+            NA1_sm(ct,:) = smooth(double(NA1(ct,:)),sm_yr);
         end
     else
-        rng(0);
-
-        N_bt = N_samples;
-        N_block = 1;
-        
-        seed = fix(unifrnd(1e-10,size(NA0,1),N_bt,size(NA0,2)))+1;
-        clear('NA0_bt','NA0_sm')
-        for ct = 1:size(NA0,2)
-            [~,b] = ind2sub([N_block,1000],ct);
-            ct_pst = (b-1)*N_block+1;
-            pst = seed(:,ct_pst);
-            temp = NA0(:,ct);        NA0_bt(:,ct) = temp(pst);
-        end
-        if sm_yr > 1
-            for ct = 1:size(NA0_bt,1)
-                NA0_sm(ct,:) = smooth(double(NA0_bt(ct,:)),sm_yr);
-            end
-        else
-            for ct = 1:size(NA0_bt,1)
-                NA0_sm(ct,:) = double(NA0_bt(ct,:));
-            end
-        end
-        
-        seed = fix(unifrnd(1e-10,size(NA1,1),N_bt,size(NA1,2)))+1;
-        clear('NA1_bt','NA1_sm')
-        for ct = 1:size(NA1,2)
-            [~,b] = ind2sub([N_block,1000],ct);
-            ct_pst = (b-1)*N_block+1;
-            pst = seed(:,ct_pst);
-            temp = NA1(:,ct);        NA1_bt(:,ct) = temp(pst);
-        end
-        if sm_yr > 1
-            for ct = 1:size(NA0_bt,1)
-                NA1_sm(ct,:) = smooth(double(NA1_bt(ct,:)),sm_yr);
-            end
-        else
-            for ct = 1:size(NA0_bt,1)
-                NA1_sm(ct,:) = double(NA1_bt(ct,:));
-            end
-        end
+        NA0_sm = NA0;
+        NA1_sm = NA1;
     end
                 
     % *********************************************************************

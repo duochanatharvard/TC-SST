@@ -1,39 +1,22 @@
-clear;
+% clear;
+rng(0);
 
-dir_home = '/Users/duochan/Data/SST_Cyclone/';
-
-% *************************************************************************  
-% observations 
-% *************************************************************************  
-TC       = load([TC_SST_IO('Results'),'Atlantic_TC_count.txt']);
-yr_obs   = TC(:,1);
-TC       = TC(:,2);
-
-% *************************************************************************  
-% read uncertainty in models associated with uncertin SST adjustments
-% *************************************************************************  
-ERR = load([TC_SST_IO('Results'),'Error_from_SST_R1.mat']);
-
-% *************************************************************************  
-% Read model outputs  
-% *************************************************************************  
-clear('P')
-P.region = 'NA';
-P.threshold_wind = 31.7;
-[NA0,~,~]        = TC_SST_ANA_function_read_data(0,P);
-[NA1,~,yr]       = TC_SST_ANA_function_read_data(1,P);
-
-N_eff_0 = nnz(any(NA0~=0,2));
-N_eff_1 = nnz(any(NA1~=0,2));
-NA0 = NA0(1:N_eff_0,:);
-NA1 = NA1(1:N_eff_1,:);
-
-do_splice = 0;                  % TODO
-if do_splice == 1               % Turn off corrections in the satellite era
-    NA1(:,[1981:2018]-1870) = NA0(:,[1981:2018]-1870);
-    ERR.Error_from_SST(:,[1989:2014] - ERR.yr(1) + 1) = 0;
-    ERR.Error_from_SST(:,[1975:1988] - ERR.yr(1) + 1) = ERR.Error_from_SST(:,[1975:1988] - ERR.yr(1) + 1) .* repmat([14:-1:1]/15,20000,1);
+P.region    = 'NA';
+if ~exist('threshold_wind','var')
+    threshold_wind   = 31.7;
 end
+P.threshold_wind = threshold_wind;
+% ANA_version = 1; % 1: 50&25km    2: 50 km only    3: 25km only
+if ~exist('ANA_version','var')
+    error('Please specify the version of analysis using variable ANA_version')
+end
+if ~exist('do_splice','var')
+    do_splice   = 0;
+end
+
+% ************************************************************************* 
+TC_SST_ANA_module_load_data;
+% ************************************************************************* 
 
 % *************************************************************************  
 % Smooth hurricane counts and assign uncertainty estimates 
@@ -46,11 +29,6 @@ sm_yr  = 15;
 
 sm_yr  = 25;            
 [NA0_25,NA1_25,TC_25,TC_25_rnd,TC_25_rnd_err] = TC_SST_ANA_function_smooth_data(sm_yr,NA0,NA1,TC,yr_obs,P);
-                    
-% ************************************************************************    
-% Estimate internal variability
-% ************************************************************************
-Internal_std = 2.11;
 
 % ************************************************************************
 % Significant test of changes in R an RMSE
@@ -58,7 +36,7 @@ Internal_std = 2.11;
 clear('P')
 P.N_sample = 10000;
 P.block_size = 10;
-P.Internal_std = Internal_std;
+P.Internal_std = sigma_internal;
 P.yr_obs = yr_obs;
 P.yr = yr;
 P.correction = nanmean(NA1,1) - nanmean(NA0,1);
@@ -73,38 +51,38 @@ for ct = [1 2]
     switch ct
         case 1
             [RS0, RS1, RMSE0, RMSE1, S] = significance_test_null_distribution ...
-                                ([1885:2011],15,TC_15,TC_15_rnd,NA0_15,NA1_15,P);
-            Table_yr(ct,:) = [1885 2011];
+                                ([1885:yr(end)-7],15,TC_15,TC_15_rnd,NA0_15,NA1_15,P);
+            Table_yr(ct,:) = [1885 yr(end)-7];
         case 2
             [RS0, RS1, RMSE0, RMSE1, S] = significance_test_null_distribution ...
-                                ([1890:2006],25,TC_25,TC_25_rnd,NA0_25,NA1_25,P);
-            Table_yr(ct,:) = [1890 2006];
+                                ([1890:yr(end)-12],25,TC_25,TC_25_rnd,NA0_25,NA1_25,P);
+            Table_yr(ct,:) = [1890 yr(end)-12];
     end
 
     Table(ct,:) = [S([1 2]).^2 S([3 4])];
-    Table_sig_95(ct,2) = (S(2).^2 - S(1).^2) > quantile((RS1.^2 - RS0.^2),0.95);
-    Table_sig_95(ct,4) = (S(4) - S(3)) < quantile((RMSE1 - RMSE0),0.05);
-    Table_sig_90(ct,2) = (S(2).^2 - S(1).^2) > quantile((RS1.^2 - RS0.^2),0.9);
-    Table_sig_90(ct,4) = (S(4) - S(3)) < quantile((RMSE1 - RMSE0),0.1);
+    p1 = 1.01-find((S(2).^2 - S(1).^2) > quantile((RS1.^2 - RS0.^2),[0:0.01:1]),1,'last')/100;
+    p2 = find((S(4) - S(3)) < quantile((RMSE1 - RMSE0),[0:0.01:1]),1,'first')/100 - 0.01;
+    Table_sig_95(ct,:) = [0 p1 0 p2];    
     
     
-    if ct == 1
+    if ct == 1 && ANA_version == 1 && do_splice == 0
         
-        figure(1); clf;
-        subplot(2,1,1); hold on;
+        figure(41); clf; hold on;
         CDF_histogram(-1:0.01:1,RS1.^2 - RS0.^2,[1 .6 0],0,2)
         plot([1 1]*(S(2).^2-S(1).^2),[0 5],'color',[1 .6 0]*.0,'linewi',3)
         plot([1 1]*nanmean(RS1.^2 - RS0.^2),[0 5],'color',[1 .6 0]*.8,'linewi',3)
-        CDF_panel([-.6 .6 0 5],'','','\Delta r^2','pdf','fontsize',18)
+        CDF_panel([-.6 .6 0 5],'','',' ','pdf','fontsize',18)
+        set(gcf,'position',[.1 13 6 4.5],'unit','inches')
+        set(gcf,'position',[.1 13 6 4.5],'unit','inches')
         
-        subplot(2,1,2); hold on;
+        figure(42); clf; hold on;
         CDF_histogram(-2:0.01:2,RMSE1 - RMSE0,[1 .6 0],0,1)
-        plot([1 1]*(S(4)-S(3)),[0 4],'color',[1 .6 0]*.0,'linewi',3)
-        plot([1 1]*nanmean(RMSE1 - RMSE0),[0 4],'color',[1 .6 0]*.8,'linewi',3)
-        CDF_panel([-.6 .6 0 4],'','','\Delta RMSE','pdf','fontsize',18)
+        plot([1 1]*(S(4)-S(3)),[0 5],'color',[1 .6 0]*.0,'linewi',3)
+        plot([1 1]*nanmean(RMSE1 - RMSE0),[0 5],'color',[1 .6 0]*.8,'linewi',3)
+        CDF_panel([-.6 .6 0 4],'','',' ','pdf','fontsize',18)
         
         set(gcf,'position',[.1 13 5 8]*1.2,'unit','inches')
-        set(gcf,'position',[.1 13 7 8]*1.2,'unit','inches')
+        set(gcf,'position',[.1 13 6 4.5],'unit','inches')
     end
 
 end
@@ -115,11 +93,25 @@ disp(' ')
 disp(' ')
 disp('     & Period & R^2(HadISST1) & R^2(HadISST1b) &  RMSE(HadISST1) & RMSE(HadISST1b) \\')
 disp(Table_latex(1,:))
-disp(['significance at the 0.05 level:  & -- & ', num2str(Table_sig_95(1,[2 4]) ,'%2.0f  & -- & %2.0f \\\\')])
-disp(['significance at the 0.10 level:  & -- & '  , num2str(Table_sig_90(1,[2 4]) ,'%2.0f  & -- & %2.0f \\\\')])
+disp(['p-value:  & -- & ', num2str(Table_sig_95(1,[2 4]) ,'%2.2f  & -- & %2.2f \\\\')])
 disp(Table_latex(2,:))
-disp(['significance at the 0.05 level:  & -- & ', num2str(Table_sig_95(2,[2 4]) ,'%2.0f  & -- & %2.0f \\\\')])
-disp(['significance at the 0.10 level:  & -- & ', num2str(Table_sig_90(2,[2 4]) ,'%2.0f  & -- & %2.0f \\\\')])
+disp(['p-value:  & -- & ', num2str(Table_sig_95(2,[2 4]) ,'%2.2f  & -- & %2.2f \\\\')])
+
+
+%% *************************************************************************
+% Print figure to files
+% *************************************************************************
+% dir_save = TC_SST_IO('Figure_save');
+% clear('a','b')
+% for ct = 1:2
+%     file = [dir_save,'Fig_5_significance_test_ANA_version_',num2str(ANA_version),'_sub_',num2str(ct),'.png'];
+%     CDF_save(50+ct,'png',300,file);
+%     a{ct} = imread(file);
+% end
+% 
+% b = [a{2}(50:end-200,220:end-100,:) a{1}(50:end-200,220:end-100,:)];
+% file = [dir_save,'Fig_5_significance_test_ANA_version_',num2str(ANA_version),'.png'];
+% imwrite(b,file);
 
 
 function [RS0, RS1, RMSE0, RMSE1, S] = ...
